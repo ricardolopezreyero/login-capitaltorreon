@@ -21,6 +21,7 @@ El `div` se llena solo y es discreto: sin sesión, solo un botón redondo con la
 - `LoginCT.pase()` → el pase firmado, para mandarlo al servidor del servicio.
 - `LoginCT.entrar()` / `LoginCT.entrar(true)` (elegir otra cuenta) / `LoginCT.salir()` (sale aquí y de la casa).
 - `LoginCT.al(fn)` avisa cuando alguien acaba de entrar; `LoginCT.montar(el)` pinta la ficha en otro elemento.
+- **Preferencias con la cuenta:** `data-prefs="clave1,clave2"` en la etiqueta del script declara qué claves de `localStorage` son personalización; se guardan por persona y por servicio (`/api/prefs`), se aplican en cualquier equipo, cambian al cambiar de cuenta y se limpian al salir. `LoginCT.alPrefs(fn)` las aplica en vivo; sin eso, la página se recarga una vez.
 - **Al tocar la foto** sale el menú de la casa: todos los juegos y proyectos (`publico/servicios.json`), en el orden de uso de cada persona (se guarda en `/api/menu`), con bote para quitar y «Salir» al final. Un servicio nuevo se agrega al catálogo una sola vez y aparece en el menú de todos.
 
 Ya está en: capitaltorreon.com, Mina, 2048, Carreteras, Cupido, Video Room y La Vela.

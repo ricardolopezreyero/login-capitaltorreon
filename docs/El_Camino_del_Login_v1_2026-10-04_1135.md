@@ -35,12 +35,16 @@ Una sola puerta para toda la casa: **login.capitaltorreon.com**.
 
 - **La foto es la puerta a todo el ecosistema.** Al tocarla salen todos los juegos y proyectos de la casa, con lo que esa persona usó más recientemente arriba, un bote para quitar lo que no le interese (y «restaurar» si se arrepiente), y «Salir» hasta abajo. El orden es de cada quien y viaja con su cuenta a todos los servicios (`/api/menu`, guardado por su identificador de Google). Así cada servicio le hace publicidad a los demás, y nadie vuelve a buscar una liga. El catálogo vive en `publico/servicios.json` del login: un servicio nuevo se agrega ahí, una sola vez, y aparece en el menú de todos.
 
+- **Las preferencias viajan con la cuenta.** Cada servicio declara qué claves de `localStorage` son personalización (`data-prefs="clave1,clave2"` en la etiqueta del script). Desde ahí, todo lo que la persona cambie (el fondo del home, el sonido de un juego, el tamaño del texto, el acercamiento…) se guarda en su cuenta, por servicio, con la hora del cambio; al entrar en otro equipo se aplica lo suyo; **al cambiar de cuenta de Google cambian todas las preferencias** (correo de negocio y correo personal, cada uno con lo suyo); al salir, el equipo vuelve a los valores de fábrica. Gana siempre el cambio más reciente. Un servicio puede aplicar los cambios en vivo con `LoginCT.alPrefs(fn)`; si no, la página se recarga una vez para que se vean. `POST /api/prefs`.
+
 ### Cómo se pone en un servicio (dos líneas, antes de `</body>`)
 
 ```html
 <div data-login-ct style="position:fixed;top:12px;right:12px;z-index:9999"></div>
-<script src="https://login.capitaltorreon.com/login.js" defer></script>
+<script src="https://login.capitaltorreon.com/login.js" data-prefs="mi_clave_de_ajustes" defer></script>
 ```
+
+`data-prefs` es opcional: son las claves de `localStorage` que guardan la personalización de ese servicio y que deben viajar con la cuenta.
 
 El `div` se llena solo y es discreto (regla de Ricardo: es prácticamente el único botón arriba a la derecha): sin sesión, solo un botón redondo con la G de Google; con sesión, solo la foto o la inicial. Al tocarla sale el menú de la casa. Puede ir donde se quiera (dentro del encabezado, por ejemplo).
 
