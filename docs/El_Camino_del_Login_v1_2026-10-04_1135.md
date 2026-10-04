@@ -29,7 +29,7 @@ Una sola puerta para toda la casa: **login.capitaltorreon.com**.
 
 - **Google solo conoce un origen:** `https://login.capitaltorreon.com`. Un solo cliente OAuth («Login CapitalTorreon», proyecto `capitaltorreon`), una sola pantalla de consentimiento, publicada. Ningún servicio nuevo vuelve a tocar Google Cloud.
 - **Cada servicio manda y recibe.** La página manda a `login.capitaltorreon.com/?volver=<su liga>`. La persona entra con Google ahí. El login verifica con Google, **firma un pase** (JWT ES256, 30 días, amarrado al dominio del servicio) y regresa a `<su liga>#sesion=<pase>`. El pase viaja después del `#`: nunca llega a ningún servidor por la dirección.
-- **Entras una vez y ya estás dentro en todos.** El login guarda su propia sesión (una cookie segura, solo en su dominio). Si otro servicio te manda a entrar, el login te reconoce y te regresa al instante, sin volver a pulsar Google. «Salir» sale del servicio y de la casa.
+- **Entras una vez y ya estás dentro en todos, sin pulsar nada.** El login guarda su propia sesión (una cookie segura, solo en su dominio). Al abrir cualquier otro servicio de la casa, `login.js` le pregunta a la casa en un marco invisible y, si ya entraste, apareces dentro con tu nombre y tu foto antes de tocar nada. Lo mismo renueva la sesión cuando le quedan menos de 7 días: nadie se queda afuera a los 30 días a media partida. «Salir» sale del servicio y de la casa. Probado el 4 de octubre: entrar en La Vela y abrir 2048 por primera vez ya te muestra «Salir».
 - **Cada servidor verifica solo**, con la llave pública (`/.well-known/jwks.json`), sin secretos compartidos y sin preguntarle a nadie. Un pase de Mina no sirve en Video Room; el de la casa no sirve fuera del login; uno alterado o vencido no sirve en ningún lado.
 - **Todo funciona sin entrar; entrar solo agrega.** Esa es nuestra forma de operar: nadie se topa con una puerta antes de usar el servicio. Entrar sirve para guardar, recuperar, ser reconocido.
 
@@ -68,7 +68,8 @@ capitaltorreon.com, Mina, 2048, Carreteras de México, Cupido Algorítmico, Vide
 5. **Entrar nunca es obligatorio.** Si un servicio no sirve sin entrar, está mal planteado.
 6. **Solo se vuelve a dominios de la casa** (`*.capitaltorreon.com`, `*.superleads.mx`, `*.ricardolopezreyero.com`, `localhost` para pruebas). Un dominio nuevo de la casa se agrega en `CASA`, en `src/index.js` del login, una sola vez.
 7. **Si se pierde la llave privada** (`LLAVE_PRIVADA` del Worker; copia en `~/.llave-login-capitaltorreon.json`), se genera otra, se publica su pública en `jwks.json` y todas las sesiones caducan: nadie pierde nada más que volver a entrar.
-8. **Antes de decir «el login no funciona»**, revisar en este orden: ¿la página carga `login.js`? ¿el dominio está en `CASA`? ¿el servidor verifica con la llave pública vigente? ¿el pase no venció (30 días)? En las apps instaladas (copia sin internet), el botón aparece al segundo arranque.
+8. **El reconocimiento en silencio solo habla con la casa.** El marco invisible solo acepta mensajes del origen `login.capitaltorreon.com`, y la casa solo manda el pase al origen exacto del servicio que preguntó (y solo si es de la casa). La página de entrar no se deja meter en marcos de nadie (`frame-ancestors 'none'`).
+9. **Antes de decir «el login no funciona»**, revisar en este orden: ¿la página carga `login.js`? ¿el dominio está en `CASA`? ¿el servidor verifica con la llave pública vigente? ¿el pase no venció (30 días)? En las apps instaladas (copia sin internet), el botón aparece al segundo arranque.
 
 ---
 

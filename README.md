@@ -16,7 +16,7 @@ En cualquier página, antes de `</body>`:
 
 El `div` se llena solo: «Entrar con Google» si no hay sesión, o la foto, el nombre y «Salir» si ya entró. Puede ir donde quieras (dentro del encabezado, por ejemplo). **Todo funciona sin entrar; entrar solo agrega.**
 
-- Quien ya entró en cualquier otro servicio de la casa **no vuelve a pulsar Google**: el login lo reconoce (sesión de la casa, 30 días) y lo regresa al instante con su sesión.
+- Quien ya entró en cualquier otro servicio de la casa **aparece dentro sin pulsar nada**: `login.js` le pregunta a la casa en un marco invisible (`/renovar`) y, si hay sesión, monta la ficha al instante. La sesión se renueva sola cuando le quedan menos de 7 días.
 - `LoginCT.quien()` → `{ sub, email, name, picture, exp }` si hay sesión vigente, o `null`.
 - `LoginCT.pase()` → el pase firmado, para mandarlo al servidor del servicio.
 - `LoginCT.entrar()` / `LoginCT.entrar(true)` (elegir otra cuenta) / `LoginCT.salir()` (sale aquí y de la casa).
