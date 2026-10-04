@@ -11,6 +11,11 @@ const json = (o, status = 200, extra = {}) => new Response(JSON.stringify(o), { 
 const enc = (s) => new TextEncoder().encode(s);
 const b64u = (u) => btoa(String.fromCharCode(...(u instanceof Uint8Array ? u : enc(u)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const limpio = (s, n) => String(s ?? "").replace(/[\u0000-\u001f<>"'`\\]/g, "").trim().slice(0, n);
+// La sesión de la casa: una cookie HttpOnly en login.capitaltorreon.com con un pase propio (aud "login"). Con ella, quien ya
+// entró una vez pasa directo a cualquier servicio sin volver a tocar Google; se borra en /salir.
+const COOKIE = "ct_sesion";
+const galleta = (v, dias) => `${COOKIE}=${v}; Path=/; Max-Age=${dias * 86400}; Secure; HttpOnly; SameSite=Lax`;
+const leerGalleta = (request) => (request.headers.get("cookie") || "").split(/;\s*/).map((c) => c.split("=")).find((c) => c[0] === COOKIE)?.[1] || "";
 
 // A dónde se puede volver: solo a los dominios de la casa (y a la computadora de pruebas).
 const CASA = [/^([a-z0-9-]+\.)*capitaltorreon\.com$/i, /^([a-z0-9-]+\.)*superleads\.mx$/i, /^([a-z0-9-]+\.)*ricardolopezreyero\.com$/i];
@@ -41,11 +46,33 @@ async function firmar(claims, env) {
   return h + "." + p + "." + b64u(sig);
 }
 
+async function paseDe(g, aud, env) {
+  const ahora = Math.floor(Date.now() / 1000), dias = Math.max(1, Math.min(365, Number(env.DIAS) || 30));
+  return { pase: await firmar({ iss: env.EMISOR, aud, sub: g.sub, email: g.email, name: g.name ?? g.nombre, picture: g.picture ?? g.foto, iat: ahora, exp: ahora + dias * 86400 }, env), exp: ahora + dias * 86400, dias };
+}
+const jwksDe = (env, request) => async () => JSON.parse(await (await env.ASSETS.fetch(new Request(new URL("/jwks.json", request.url)))).text());
+
 export default {
   async fetch(request, env) {
     const u = new URL(request.url);
     const cors = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type" };
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+
+    // La página de entrar con ?volver=: si ya hay sesión de la casa (y no se pidió elegir cuenta), pasa directo sin pulsar nada.
+    if (u.pathname === "/" && request.method === "GET" && u.searchParams.get("volver") && !u.searchParams.has("elegir")) {
+      const volver = volverOk(u.searchParams.get("volver")), g = await verificarPase(leerGalleta(request), env.EMISOR, jwksDe(env, request));
+      if (volver && g && g.aud === "login") { const { pase, dias } = await paseDe(g, volver.hostname, env); return new Response(null, { status: 302, headers: { location: volver.href + "#sesion=" + pase, "set-cookie": galleta((await paseDe(g, "login", env)).pase, dias), "cache-control": "no-store" } }); }
+    }
+    // Salir de la casa: se borra la cookie y se vuelve al servicio (que borra la suya).
+    if (u.pathname === "/salir") {
+      const volver = volverOk(u.searchParams.get("volver") || "");
+      return new Response(null, { status: 302, headers: { location: volver ? volver.href + "#salio=1" : "/", "set-cookie": galleta("", 0), "cache-control": "no-store" } });
+    }
+    // ¿Quién soy? (para la página de entrar, que lo enseña y ofrece «seguir como…»)
+    if (u.pathname === "/api/quien" && request.method === "GET") {
+      const g = await verificarPase(leerGalleta(request), env.EMISOR, jwksDe(env, request));
+      return json(g && g.aud === "login" ? { email: g.email, name: g.name, picture: g.picture } : {}, 200);
+    }
 
     if (u.pathname === "/api/cliente") return json({ id: env.GOOGLE_CLIENT_ID, emisor: env.EMISOR }, 200, cors);
 
@@ -60,15 +87,15 @@ export default {
       let d; try { d = await request.json(); } catch { return json({ error: "datos" }, 400, cors); }
       const volver = volverOk(d.volver); if (!volver) return json({ error: "volver" }, 400, cors);
       const g = await verificarGoogle(d.credential, env); if (!g) return json({ error: "google" }, 401, cors);
-      const ahora = Math.floor(Date.now() / 1000), dias = Math.max(1, Math.min(365, Number(env.DIAS) || 30));
-      const pase = await firmar({ iss: env.EMISOR, aud: volver.hostname, sub: g.sub, email: g.email, name: g.nombre, picture: g.foto, iat: ahora, exp: ahora + dias * 86400 }, env);
-      return json({ pase, volver: volver.href + "#sesion=" + pase, exp: ahora + dias * 86400 }, 200, cors);
+      const { pase, exp, dias } = await paseDe(g, volver.hostname, env), casa = await paseDe(g, "login", env);
+      return json({ pase, volver: volver.href + "#sesion=" + pase, exp }, 200, { ...cors, "set-cookie": galleta(casa.pase, dias) });
     }
 
     // Verificar un pase desde un servidor (quien no quiera verificar con la llave pública).
     if (u.pathname === "/api/verificar" && request.method === "POST") {
       let d; try { d = await request.json(); } catch { return json({ error: "datos" }, 400, cors); }
-      const r = await verificarPase(String(d.pase || ""), env.EMISOR, async () => JSON.parse(await (await env.ASSETS.fetch(new Request(new URL("/jwks.json", request.url)))).text()));
+      const r = await verificarPase(String(d.pase || ""), env.EMISOR, jwksDe(env, request));
+      if (r && r.aud === "login") return json({ error: "pase" }, 401, cors);      // el pase de la casa no sirve fuera de aquí
       return r ? json({ ok: 1, ...r }, 200, cors) : json({ error: "pase" }, 401, cors);
     }
 

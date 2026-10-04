@@ -48,6 +48,8 @@ async function alEntrar(r) {
 }
 (async () => {
   const { id } = await (await fetch('/api/cliente')).json();
+  // Si ya entró en otro servicio, se le ofrece seguir con esa cuenta sin pasar por Google otra vez.
+  if (volver && new URLSearchParams(location.search).has('elegir')) { try { const q = await (await fetch('/api/quien')).json(); if (q.email) { const d = document.createElement('p'); d.innerHTML = 'Ya estás dentro como <b>' + q.email.replace(/[<>&]/g, '') + '</b>. <a href="/?volver=' + encodeURIComponent(volver) + '">Seguir con esa cuenta</a> o elige otra abajo.'; document.getElementById('g').before(d); } } catch {} }
   await new Promise((ok, mal) => { const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client'; s.async = true; s.onload = ok; s.onerror = mal; document.head.appendChild(s); });
   google.accounts.id.initialize({ client_id: id, callback: alEntrar, auto_select: true, cancel_on_tap_outside: true, context: 'signin', ux_mode: 'popup', itp_support: true });
   google.accounts.id.renderButton(document.getElementById('g'), { type: 'standard', theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'pill', locale: 'es' });
