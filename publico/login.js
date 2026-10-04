@@ -9,7 +9,7 @@
 (function () {
   const LLAVE = 'ct_sesion', EMISOR = 'https://login.capitaltorreon.com', oyentes = [];
   const lee = () => { try { return localStorage.getItem(LLAVE) || ''; } catch { return ''; } };
-  const cuerpo = (p) => { try { const c = JSON.parse(atob(p.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))); return c.exp > Date.now() / 1000 && c.aud === location.hostname ? c : null; } catch { return null; } };
+  const cuerpo = (p) => { try { const c = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(p.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')), (ch) => ch.charCodeAt(0)))); return c.exp > Date.now() / 1000 && c.aud === location.hostname ? c : null; } catch { return null; } };      // el pase viene en UTF-8: los acentos llegan bien
   const limpiar = () => history.replaceState(null, '', location.pathname + location.search);
   let recien = false;
   const tomar = () => {
