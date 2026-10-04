@@ -110,8 +110,23 @@ export default {
       return r ? json({ ok: 1, ...r }, 200, cors) : json({ error: "pase" }, 401, cors);
     }
 
+    // El menú personal: qué servicio usó más recientemente cada persona y cuáles quitó. Se identifica con su pase (cualquier
+    // servicio de la casa) y se guarda por su identificador de Google, así la viaja a todos los servicios.
+    if (u.pathname === "/api/menu" && request.method === "POST") {
+      let d; try { d = await request.json(); } catch { return json({ error: "datos" }, 400, cors); }
+      const g = await verificarPase(String(d.pase || ""), env.EMISOR, jwksDe(env, request));
+      if (!g || g.aud === "login") return json({ error: "pase" }, 401, cors);
+      const llave = "menu:" + g.sub, ids = (a) => (Array.isArray(a) ? a : []).map((x) => String(x).replace(/[^a-z0-9-]/gi, "").slice(0, 32)).filter(Boolean).slice(0, 100);
+      let m = (await env.MENU.get(llave, "json")) || { orden: [], ocultos: [] };
+      if (d.uso) { const id = ids([d.uso])[0]; if (id) { m.orden = [id, ...m.orden.filter((x) => x !== id)].slice(0, 100); m.ocultos = m.ocultos.filter((x) => x !== id); } }
+      if (d.ocultar) { const id = ids([d.ocultar])[0]; if (id && !m.ocultos.includes(id)) m.ocultos.push(id); }
+      if (d.restaurar) m.ocultos = [];
+      if (d.uso || d.ocultar || d.restaurar) { m.t = Date.now(); await env.MENU.put(llave, JSON.stringify(m)); }
+      return json(m, 200, cors);
+    }
     if (u.pathname.startsWith("/api/")) return json({ error: "no" }, 404, cors);
     const r = await env.ASSETS.fetch(request);
+    if (u.pathname === "/servicios.json" || u.pathname === "/login.js" || u.pathname === "/verificar.js") { const h = new Headers(r.headers); h.set("access-control-allow-origin", "*"); h.set("cache-control", "public, max-age=300, stale-while-revalidate=86400"); return new Response(r.body, { status: r.status, headers: h }); }
     if ((r.headers.get("content-type") || "").includes("text/html")) { const h = new Headers(r.headers); h.set("content-security-policy", "frame-ancestors 'none'"); h.set("x-frame-options", "DENY"); h.set("referrer-policy", "strict-origin-when-cross-origin"); return new Response(r.body, { status: r.status, headers: h }); }
     return r;
   },

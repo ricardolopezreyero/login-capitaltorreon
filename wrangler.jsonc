@@ -10,6 +10,8 @@
   "assets": { "directory": "./publico", "binding": "ASSETS", "run_worker_first": true },
   // GOOGLE_CLIENT_ID: el cliente OAuth «CapitalTorreon» de Google Cloud, con un solo origen autorizado: https://login.capitaltorreon.com
   "vars": { "GOOGLE_CLIENT_ID": "619985558596-ek27pd3tqm1q3lu1iju8t856kaj9frqs.apps.googleusercontent.com", "EMISOR": "https://login.capitaltorreon.com", "DIAS": "30" },
+  // MENU: el orden personal del menú de servicios de cada persona (por su identificador de Google)
+  "kv_namespaces": [{ "binding": "MENU", "id": "6ff1016808d849a59058e7a75566c80d" }],
   "routes": [{ "pattern": "login.capitaltorreon.com", "custom_domain": true }],
   "workers_dev": false,
   "preview_urls": false
