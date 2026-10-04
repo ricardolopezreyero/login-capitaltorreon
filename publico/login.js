@@ -39,4 +39,19 @@
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montarTodos); else montarTodos();
   if (recien) setTimeout(() => oyentes.forEach((f) => f(LoginCT.quien())), 0);
+  // Reconocer en silencio: si aquí no hay sesión (o le quedan menos de 7 días), se le pregunta a la casa en un marco oculto.
+  // Si la persona ya entró en cualquier otro servicio, aparece dentro sin pulsar nada; si no, no pasa nada visible.
+  const q0 = cuerpo(lee());
+  if (!/salio=1/.test(location.hash) && (!q0 || q0.exp - Date.now() / 1000 < 7 * 86400) && !sessionStorage.getItem('ct_pregunte')) {
+    try { sessionStorage.setItem('ct_pregunte', '1'); } catch {}
+    const f = document.createElement('iframe'); f.src = EMISOR + '/renovar?para=' + encodeURIComponent(location.host); f.style.cssText = 'position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none'; f.setAttribute('aria-hidden', 'true'); f.tabIndex = -1;
+    const fin = () => { try { f.remove(); } catch {} };
+    addEventListener('message', (e) => {
+      if (e.origin !== EMISOR || !e.data || e.source !== f.contentWindow) return;
+      if (e.data.ct === 'pase' && typeof e.data.pase === 'string' && cuerpo(e.data.pase)) { try { localStorage.setItem(LLAVE, e.data.pase); } catch {} const nuevo = !q0; montarTodos(); if (nuevo) oyentes.forEach((fn) => fn(LoginCT.quien())); }
+      fin();
+    });
+    f.onerror = fin; setTimeout(fin, 15000);
+    (document.body || document.documentElement).appendChild(f);
+  }
 })();

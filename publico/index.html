@@ -48,6 +48,7 @@ async function alEntrar(r) {
 }
 (async () => {
   const { id } = await (await fetch('/api/cliente')).json();
+  if (!volver) { try { const q = await (await fetch('/api/quien')).json(); if (q.email) { document.getElementById('para').innerHTML = 'Estás dentro como <b>' + q.email.replace(/[<>&]/g, '') + '</b>. Con esta cuenta entras a todos los servicios de la casa sin volver a pulsar nada.'; document.getElementById('g').innerHTML = '<a href="https://capitaltorreon.com" style="color:#fff;font-weight:700">Ir a CapitalTorreon</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="/salir" style="color:#9a9ca3">Salir de todos</a>'; return; } } catch {} }
   // Si ya entró en otro servicio, se le ofrece seguir con esa cuenta sin pasar por Google otra vez.
   if (volver && new URLSearchParams(location.search).has('elegir')) { try { const q = await (await fetch('/api/quien')).json(); if (q.email) { const d = document.createElement('p'); d.innerHTML = 'Ya estás dentro como <b>' + q.email.replace(/[<>&]/g, '') + '</b>. <a href="/?volver=' + encodeURIComponent(volver) + '">Seguir con esa cuenta</a> o elige otra abajo.'; document.getElementById('g').before(d); } } catch {} }
   await new Promise((ok, mal) => { const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client'; s.async = true; s.onload = ok; s.onerror = mal; document.head.appendChild(s); });

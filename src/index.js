@@ -63,6 +63,17 @@ export default {
       const volver = volverOk(u.searchParams.get("volver")), g = await verificarPase(leerGalleta(request), env.EMISOR, jwksDe(env, request));
       if (volver && g && g.aud === "login") { const { pase, dias } = await paseDe(g, volver.hostname, env); return new Response(null, { status: 302, headers: { location: volver.href + "#sesion=" + pase, "set-cookie": galleta((await paseDe(g, "login", env)).pase, dias), "cache-control": "no-store" } }); }
     }
+    // Reconocer en silencio: un servicio mete esta página en un marco oculto; si hay sesión de la casa, se le manda un pase
+    // nuevo por postMessage, solo al origen del servicio. Así, quien ya entró en cualquier parte de la casa llega a un servicio
+    // nuevo y ya está dentro, y una sesión por vencer se renueva sin que nadie haga nada.
+    if (u.pathname === "/renovar" && request.method === "GET") {
+      const para = volverOk("https://" + String(u.searchParams.get("para") || "").replace(/[^a-z0-9.:-]/gi, "")) || (/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(u.searchParams.get("para") || "") ? new URL("http://" + u.searchParams.get("para")) : null);
+      const g = para ? await verificarPase(leerGalleta(request), env.EMISOR, jwksDe(env, request)) : null;
+      const cab = { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "content-security-policy": "frame-ancestors https://*.capitaltorreon.com https://*.superleads.mx https://*.ricardolopezreyero.com http://localhost:* http://127.0.0.1:*" };
+      if (!para || !g || g.aud !== "login") return new Response(`<!doctype html><script>parent.postMessage({ ct: "nadie" }, ${JSON.stringify(para ? para.origin : "*")});</script>`, { headers: cab });
+      const { pase, dias } = await paseDe(g, para.hostname, env);
+      return new Response(`<!doctype html><script>parent.postMessage({ ct: "pase", pase: ${JSON.stringify(pase)} }, ${JSON.stringify(para.origin)});</script>`, { headers: { ...cab, "set-cookie": galleta((await paseDe(g, "login", env)).pase, dias) } });
+    }
     // Salir de la casa: se borra la cookie y se vuelve al servicio (que borra la suya).
     if (u.pathname === "/salir") {
       const volver = volverOk(u.searchParams.get("volver") || "");
@@ -100,7 +111,9 @@ export default {
     }
 
     if (u.pathname.startsWith("/api/")) return json({ error: "no" }, 404, cors);
-    return env.ASSETS.fetch(request);
+    const r = await env.ASSETS.fetch(request);
+    if ((r.headers.get("content-type") || "").includes("text/html")) { const h = new Headers(r.headers); h.set("content-security-policy", "frame-ancestors 'none'"); h.set("x-frame-options", "DENY"); h.set("referrer-policy", "strict-origin-when-cross-origin"); return new Response(r.body, { status: r.status, headers: h }); }
+    return r;
   },
 };
 
