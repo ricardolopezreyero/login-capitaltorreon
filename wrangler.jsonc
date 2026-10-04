@@ -9,7 +9,7 @@
   "compatibility_date": "2026-09-01",
   "assets": { "directory": "./publico", "binding": "ASSETS", "run_worker_first": true },
   // GOOGLE_CLIENT_ID: el cliente OAuth «CapitalTorreon» de Google Cloud, con un solo origen autorizado: https://login.capitaltorreon.com
-  "vars": { "GOOGLE_CLIENT_ID": "PENDIENTE.apps.googleusercontent.com", "EMISOR": "https://login.capitaltorreon.com", "DIAS": "30" },
+  "vars": { "GOOGLE_CLIENT_ID": "619985558596-ek27pd3tqm1q3lu1iju8t856kaj9frqs.apps.googleusercontent.com", "EMISOR": "https://login.capitaltorreon.com", "DIAS": "30" },
   "routes": [{ "pattern": "login.capitaltorreon.com", "custom_domain": true }],
   "workers_dev": false,
   "preview_urls": false
