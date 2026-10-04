@@ -7,17 +7,22 @@ Un solo login con Google para todos los servicios de CapitalTorreon. Google solo
 
 ## Cómo entra un servicio (dos líneas)
 
-En cualquier página:
+En cualquier página, antes de `</body>`:
 
 ```html
-<script src="https://login.capitaltorreon.com/login.js"></script>
-<button onclick="LoginCT.entrar()">Entrar</button>
+<div data-login-ct style="position:fixed;top:12px;right:12px;z-index:9999"></div>
+<script src="https://login.capitaltorreon.com/login.js" defer></script>
 ```
 
-- `LoginCT.entrar()` manda a `login.capitaltorreon.com/?volver=<esta página>`; la persona entra con Google y vuelve a la misma página con `#sesion=<pase>` (el script lo guarda solo y limpia la liga).
-- `LoginCT.quien()` → `{ sub, email, name, picture, exp }` si hay sesión vigente (30 días), o `null`.
+El `div` se llena solo: «Entrar con Google» si no hay sesión, o la foto, el nombre y «Salir» si ya entró. Puede ir donde quieras (dentro del encabezado, por ejemplo). **Todo funciona sin entrar; entrar solo agrega.**
+
+- Quien ya entró en cualquier otro servicio de la casa **no vuelve a pulsar Google**: el login lo reconoce (sesión de la casa, 30 días) y lo regresa al instante con su sesión.
+- `LoginCT.quien()` → `{ sub, email, name, picture, exp }` si hay sesión vigente, o `null`.
 - `LoginCT.pase()` → el pase firmado, para mandarlo al servidor del servicio.
-- `LoginCT.salir()` → cierra la sesión en ese navegador.
+- `LoginCT.entrar()` / `LoginCT.entrar(true)` (elegir otra cuenta) / `LoginCT.salir()` (sale aquí y de la casa).
+- `LoginCT.al(fn)` avisa cuando alguien acaba de entrar; `LoginCT.montar(el)` pinta la ficha en otro elemento.
+
+Ya está en: capitaltorreon.com, Mina, 2048, Carreteras, Cupido, Video Room y La Vela.
 
 En el Worker del servicio, para no confiar en el navegador, copia [`publico/verificar.js`](publico/verificar.js) y:
 
