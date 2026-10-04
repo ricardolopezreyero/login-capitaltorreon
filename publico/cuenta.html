@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Mi cuenta · CapitalTorreon</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111'/%3E%3Ctext x='16' y='22' font-size='17' text-anchor='middle' fill='%23fff' font-family='system-ui' font-weight='800'%3ECT%3C/text%3E%3C/svg%3E">
+<style>
+/* RLR · Ricardo López Reyero */
+:root{--bg:#0f0f10;--caja:#17181a;--borde:#2a2c30;--tx:#f4f4f5;--su:#9a9ca3;--ac:#ffd23f}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+html.ct-texto-grande{font-size:18px}
+main{max-width:720px;margin:0 auto;padding:28px 18px 60px}
+.cab{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.cab img,.cab i{width:56px;height:56px;border-radius:50%;background:#fff;color:#111;font-style:normal;display:grid;place-items:center;font-weight:800;font-size:22px}
+.cab b{display:block;font-size:1.2em}.cab small{color:var(--su)}
+.volver{margin-left:auto;color:var(--su);text-decoration:none;border:1px solid var(--borde);border-radius:99px;padding:7px 12px;white-space:nowrap}
+section{background:var(--caja);border:1px solid var(--borde);border-radius:18px;padding:16px 18px;margin-bottom:16px}
+h2{margin:0 0 4px;font-size:1.05em}
+.nota{color:var(--su);font-size:.9em;margin:0 0 12px}
+.op{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #ffffff12}
+.op:first-of-type{border-top:0}
+.op span{flex:1}.op small{display:block;color:var(--su);font-size:.85em}
+.sw{position:relative;width:46px;height:26px;border-radius:13px;background:#3a3c42;border:0;cursor:pointer;flex:none;transition:background .15s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw[aria-checked="true"]{background:var(--ac)}.sw[aria-checked="true"]::after{transform:translateX(20px)}
+.uso{display:grid;grid-template-columns:1fr auto auto;gap:6px 14px;align-items:center}
+.uso div{padding:6px 0;border-top:1px solid #ffffff12}.uso div:nth-child(-n+3){border-top:0}
+.uso b{font-weight:600}.uso .n{color:var(--su);font-size:.9em;text-align:right;white-space:nowrap}
+.vacio{color:var(--su)}
+button.mal{background:transparent;color:#ff8a80;border:1px solid #5a2a2a;border-radius:99px;padding:8px 14px;font:inherit;cursor:pointer}
+button.s{background:transparent;color:var(--tx);border:1px solid var(--borde);border-radius:99px;padding:8px 14px;font:inherit;cursor:pointer}
+.fila{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#estado{color:var(--su);font-size:.9em;min-height:1.4em}
+</style>
+</head>
+<body>
+<main>
+  <div class="cab"><div id="foto"></div><div><b id="nombre">…</b><small id="correo"></small></div><a class="volver" id="volver" href="https://capitaltorreon.com">← Volver</a></div>
+
+  <section>
+    <h2>Superpoderes</h2>
+    <p class="nota">Lo que prendas aquí aplica en <b>todos</b> los servicios de la casa, en cualquier equipo donde entres con esta cuenta. Cada cuenta de Google tiene los suyos.</p>
+    <div class="op"><span>Texto más grande<small>Para leer cómodo, también en el teléfono.</small></span><button class="sw" data-k="texto" data-on="grande" role="switch" aria-checked="false"></button></div>
+    <div class="op"><span>Alto contraste<small>Textos y controles más marcados.</small></span><button class="sw" data-k="contraste" data-on="1" role="switch" aria-checked="false"></button></div>
+    <div class="op"><span>Menos movimiento<small>Sin animaciones ni temblores; todo más quieto.</small></span><button class="sw" data-k="movimiento" data-on="reducido" role="switch" aria-checked="false"></button></div>
+    <div class="op"><span>Silencio<small>Los servicios arrancan sin sonido; cada uno lo deja prender a mano.</small></span><button class="sw" data-k="sonido" data-on="silencio" role="switch" aria-checked="false"></button></div>
+    <div class="op"><span>Modo noche<small>Menos brillo y menos movimiento. La casa lo sugiere sola si te ve de noche.</small></span><button class="sw" data-k="noche" data-on="1" role="switch" aria-checked="false"></button></div>
+  </section>
+
+  <section>
+    <h2>Tu uso</h2>
+    <p class="nota">Tiempo real de uso por servicio (con la pestaña a la vista y usándola). Con esto la casa te sugiere lo que sigue y cómo acomodarse a ti.</p>
+    <div class="uso" id="uso"><span class="vacio">Todavía nada.</span></div>
+  </section>
+
+  <section>
+    <h2>Tu menú</h2>
+    <p class="nota">Lo que tocas más recientemente sube al principio del menú de tu foto. Lo que quitaste se puede regresar.</p>
+    <div id="menu" class="vacio">—</div>
+  </section>
+
+  <section>
+    <h2>Lo que la casa sabe de ti</h2>
+    <p class="nota">Tu correo, tu nombre y tu foto de Google; tus superpoderes; tus preferencias en cada servicio; tu uso por servicio y tu menú. Nada más, y nada de esto se comparte ni se vende. Todo se puede borrar aquí, de una vez.</p>
+    <div class="fila"><button class="s" id="ver">Ver todo en crudo</button><button class="mal" id="borrar">Borrar todo lo que la casa sabe de mí</button></div>
+    <pre id="crudo" style="display:none;white-space:pre-wrap;color:var(--su);font-size:.8em"></pre>
+    <p id="estado"></p>
+  </section>
+</main>
+<script>
+// RLR · Mi cuenta: todo con la cookie de la casa (/api/cuenta). Los superpoderes se guardan al instante y los demás
+// servicios los toman al abrirse (login.js los lee de la cuenta).
+const $ = (s) => document.querySelector(s), esc = (s) => String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const volver = new URLSearchParams(location.search).get('volver'); if (volver && /^https:\/\/[a-z0-9.-]+\.(capitaltorreon\.com|superleads\.mx|ricardolopezreyero\.com)(\/|$)/i.test(volver)) $('#volver').href = volver;
+const tiempo = (s) => s < 60 ? Math.round(s) + ' s' : s < 3600 ? Math.round(s / 60) + ' min' : (s / 3600).toFixed(1).replace('.0', '') + ' h';
+let datos = null, catalogo = [];
+async function cargar() {
+  const r = await fetch('/api/cuenta'); if (r.status === 401) { location.href = '/?volver=' + encodeURIComponent(location.href); return; }
+  datos = await r.json(); try { catalogo = (await (await fetch('/servicios.json')).json()).servicios; } catch {}
+  const q = datos.quien; $('#nombre').textContent = q.name || q.email; $('#correo').textContent = q.email;
+  $('#foto').innerHTML = q.picture ? `<img src="${esc(q.picture)}" alt="" referrerpolicy="no-referrer">` : `<i>${esc(((q.name || '').split(' ').find((w) => w && !/^(ing|lic|dr|dra|mtro|mtra|arq|sr|sra)\.?$/i.test(w)) || q.email)[0].toUpperCase())}</i>`;
+  document.querySelectorAll('.sw').forEach((b) => { const c = datos.casa[b.dataset.k]; b.setAttribute('aria-checked', c && c.v === b.dataset.on ? 'true' : 'false'); });
+  document.documentElement.classList.toggle('ct-texto-grande', !!(datos.casa.texto && datos.casa.texto.v === 'grande'));
+  const nombre = (host) => (catalogo.find((s) => s.host === host) || { ic: '·', n: host }), u = Object.entries(datos.uso).sort((a, b) => (b[1].seg || 0) - (a[1].seg || 0));
+  $('#uso').innerHTML = u.length ? u.map(([h, x]) => { const s = nombre(h); return `<div><b>${s.ic} ${esc(s.n)}</b></div><div class="n">${tiempo(x.seg || 0)}</div><div class="n">${x.visitas || 0} ${x.visitas === 1 ? 'visita' : 'visitas'}${x.movil > (x.escritorio || 0) ? ' · más en el teléfono' : ''}</div>`; }).join('') : '<span class="vacio">Todavía nada: empieza a usar la casa con tu cuenta.</span>';
+  const m = datos.menu, orden = (m.orden || []).map((id) => catalogo.find((s) => s.id === id)).filter(Boolean), oc = (m.ocultos || []).map((id) => catalogo.find((s) => s.id === id)).filter(Boolean);
+  $('#menu').innerHTML = (orden.length ? 'Tu orden: ' + orden.map((s) => s.ic + ' ' + esc(s.n)).join(' · ') : 'Todavía con el orden de fábrica.') + (oc.length ? '<br>Quitados: ' + oc.map((s) => s.ic + ' ' + esc(s.n)).join(' · ') : '');
+}
+document.querySelectorAll('.sw').forEach((b) => b.addEventListener('click', async () => {
+  const on = b.getAttribute('aria-checked') !== 'true'; b.setAttribute('aria-checked', on ? 'true' : 'false');
+  if (b.dataset.k === 'texto') document.documentElement.classList.toggle('ct-texto-grande', on);
+  $('#estado').textContent = 'Guardando…';
+  try { await fetch('/api/cuenta', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ casa: { [b.dataset.k]: on ? b.dataset.on : null } }) }); $('#estado').textContent = 'Guardado. Aplica en cada servicio al abrirlo.'; } catch { $('#estado').textContent = 'No se pudo guardar. Revisa tu conexión.'; }
+}));
+$('#ver').onclick = () => { const p = $('#crudo'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; p.textContent = JSON.stringify(datos, null, 2); };
+$('#borrar').onclick = async () => { if (!confirm('¿Borrar todo lo que la casa sabe de ti? Superpoderes, preferencias, uso y menú. Tu cuenta de Google no se toca; puedes volver a entrar cuando quieras.')) return; await fetch('/api/cuenta', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ borrar: 'todo' }) }); $('#estado').textContent = 'Borrado. La casa vuelve a empezar contigo desde cero.'; cargar(); };
+cargar().catch(() => { $('#estado').textContent = 'No se pudo cargar tu cuenta.'; });
+</script>
+<!-- RLR · Ricardo López Reyero -->
+</body>
+</html>

@@ -132,11 +132,37 @@ export default {
       const g = await verificarPase(String(d.pase || ""), env.EMISOR, jwksDe(env, request));
       if (!g || g.aud === "login") return json({ error: "pase" }, 401, cors);
       const llave = "prefs:" + g.sub, host = g.aud, ok = (k) => typeof k === "string" && /^[\w.:-]{1,64}$/.test(k);
-      let todo = (await env.MENU.get(llave, "json")) || {}; let p = todo[host] || {}, cambio = false;
-      if (d.set && typeof d.set === "object") for (const [k, x] of Object.entries(d.set).slice(0, 60)) { if (!ok(k) || !x || typeof x.v !== "string" || x.v.length > 20000) continue; const t = Math.min(Date.now() + 60000, Math.floor(Number(x.t)) || Date.now()); if (!p[k] || p[k].t < t) { p[k] = { v: x.v, t }; cambio = true; } }
+      let todo = (await env.MENU.get(llave, "json")) || {}; let p = todo[host] || {}, casa = todo["*"] || {}, cambio = false;
+      const poner = (dest, lista) => { for (const [k, x] of Object.entries(lista).slice(0, 60)) { if (!ok(k) || !x || typeof x.v !== "string" || x.v.length > 20000) continue; const t = Math.min(Date.now() + 60000, Math.floor(Number(x.t)) || Date.now()); if (!dest[k] || dest[k].t < t) { dest[k] = { v: x.v, t }; cambio = true; } } };
+      if (d.set && typeof d.set === "object") poner(p, d.set);
+      if (d.casa && typeof d.casa === "object") poner(casa, d.casa);             // los superpoderes: aplican en toda la casa
       if (Array.isArray(d.borrar)) for (const k of d.borrar.slice(0, 60)) { if (ok(k) && p[k]) { delete p[k]; cambio = true; } }
-      if (cambio) { todo[host] = p; const texto = JSON.stringify(todo); if (texto.length > 400000) return json({ error: "grande" }, 413, cors); await env.MENU.put(llave, texto); }
-      return json({ prefs: p }, 200, cors);
+      if (cambio) { todo[host] = p; todo["*"] = casa; const texto = JSON.stringify(todo); if (texto.length > 400000) return json({ error: "grande" }, 413, cors); await env.MENU.put(llave, texto); }
+      return json({ prefs: p, casa }, 200, cors);
+    }
+    // El uso: cuánto tiempo pasa cada persona en cada servicio, cuántas visitas, a qué horas y desde qué equipo. Es lo que
+    // permite sugerir con fundamento (la siguiente app, el modo noche, el texto grande). Se ve y se borra desde /cuenta.
+    if (u.pathname === "/api/uso" && request.method === "POST") {
+      let d; try { d = await request.json(); } catch { return json({ error: "datos" }, 400, cors); }
+      const g = await verificarPase(String(d.pase || ""), env.EMISOR, jwksDe(env, request));
+      if (!g || g.aud === "login") return json({ error: "pase" }, 401, cors);
+      const llave = "uso:" + g.sub, todo = (await env.MENU.get(llave, "json")) || {}, h = todo[g.aud] || { seg: 0, visitas: 0, horas: Array(24).fill(0), movil: 0, escritorio: 0, primera: Date.now(), ult: 0 };
+      const seg = Math.max(0, Math.min(600, Math.floor(Number(d.seg)) || 0)), hora = Math.max(0, Math.min(23, Math.floor(Number(d.hora)) || 0));
+      h.seg += seg; if (d.visita) h.visitas++; h.horas[hora] = (h.horas[hora] || 0) + seg; if (d.movil) h.movil += seg; else h.escritorio += seg; h.ult = Date.now();
+      todo[g.aud] = h; await env.MENU.put(llave, JSON.stringify(todo));
+      return json({ uso: todo }, 200, cors);
+    }
+    // Mi cuenta: todo lo que la casa sabe de la persona, para verlo, ajustarlo o borrarlo. Con la cookie de la casa.
+    if (u.pathname === "/api/cuenta") {
+      const g = await verificarPase(leerGalleta(request), env.EMISOR, jwksDe(env, request));
+      if (!g || g.aud !== "login") return json({ error: "sesion" }, 401);
+      if (request.method === "POST") {
+        let d; try { d = await request.json(); } catch { return json({ error: "datos" }, 400); }
+        if (d.borrar === "todo") { await Promise.all([env.MENU.delete("prefs:" + g.sub), env.MENU.delete("uso:" + g.sub), env.MENU.delete("menu:" + g.sub)]); return json({ ok: 1, borrado: 1 }); }
+        if (d.casa && typeof d.casa === "object") { const todo = (await env.MENU.get("prefs:" + g.sub, "json")) || {}, casa = todo["*"] || {}; for (const [k, v] of Object.entries(d.casa).slice(0, 30)) { if (!/^[\w.:-]{1,64}$/.test(k)) continue; if (v === null || v === "") delete casa[k]; else if (typeof v === "string" && v.length < 200) casa[k] = { v, t: Date.now() }; } todo["*"] = casa; await env.MENU.put("prefs:" + g.sub, JSON.stringify(todo)); }
+      }
+      const [prefs, uso, menu] = await Promise.all([env.MENU.get("prefs:" + g.sub, "json"), env.MENU.get("uso:" + g.sub, "json"), env.MENU.get("menu:" + g.sub, "json")]);
+      return json({ quien: { sub: g.sub, email: g.email, name: g.name, picture: g.picture }, casa: (prefs && prefs["*"]) || {}, prefs: prefs || {}, uso: uso || {}, menu: menu || { orden: [], ocultos: [] } });
     }
     if (u.pathname.startsWith("/api/")) return json({ error: "no" }, 404, cors);
     const r = await env.ASSETS.fetch(request);
