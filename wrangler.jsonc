@@ -1,0 +1,16 @@
+// RLR · Login de CapitalTorreon · login.capitaltorreon.com — Ricardo López Reyero
+// Un solo login con Google para todos los servicios de CapitalTorreon. Google solo conoce ESTE origen; cada servicio
+// manda aquí y recibe una sesión firmada que verifica solo, con la llave pública.
+// Probar en local: npx wrangler dev   ·   Publicar: npx wrangler deploy
+{
+  "name": "login-capitaltorreon",
+  "account_id": "93695b987a7460c681c06ca4df901ef4",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "assets": { "directory": "./publico", "binding": "ASSETS", "run_worker_first": true },
+  // GOOGLE_CLIENT_ID: el cliente OAuth «CapitalTorreon» de Google Cloud, con un solo origen autorizado: https://login.capitaltorreon.com
+  "vars": { "GOOGLE_CLIENT_ID": "PENDIENTE.apps.googleusercontent.com", "EMISOR": "https://login.capitaltorreon.com", "DIAS": "30" },
+  "routes": [{ "pattern": "login.capitaltorreon.com", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false
+}
