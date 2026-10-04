@@ -21,6 +21,7 @@ El `div` se llena solo: «Entrar con Google» si no hay sesión, o la foto, el n
 - `LoginCT.pase()` → el pase firmado, para mandarlo al servidor del servicio.
 - `LoginCT.entrar()` / `LoginCT.entrar(true)` (elegir otra cuenta) / `LoginCT.salir()` (sale aquí y de la casa).
 - `LoginCT.al(fn)` avisa cuando alguien acaba de entrar; `LoginCT.montar(el)` pinta la ficha en otro elemento.
+- **Al tocar la foto** sale el menú de la casa: todos los juegos y proyectos (`publico/servicios.json`), en el orden de uso de cada persona (se guarda en `/api/menu`), con bote para quitar y «Salir» al final. Un servicio nuevo se agrega al catálogo una sola vez y aparece en el menú de todos.
 
 Ya está en: capitaltorreon.com, Mina, 2048, Carreteras, Cupido, Video Room y La Vela.
 

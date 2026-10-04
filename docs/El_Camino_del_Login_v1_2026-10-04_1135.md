@@ -33,6 +33,8 @@ Una sola puerta para toda la casa: **login.capitaltorreon.com**.
 - **Cada servidor verifica solo**, con la llave pública (`/.well-known/jwks.json`), sin secretos compartidos y sin preguntarle a nadie. Un pase de Mina no sirve en Video Room; el de la casa no sirve fuera del login; uno alterado o vencido no sirve en ningún lado.
 - **Todo funciona sin entrar; entrar solo agrega.** Esa es nuestra forma de operar: nadie se topa con una puerta antes de usar el servicio. Entrar sirve para guardar, recuperar, ser reconocido.
 
+- **La foto es la puerta a todo el ecosistema.** Al tocarla salen todos los juegos y proyectos de la casa, con lo que esa persona usó más recientemente arriba, un bote para quitar lo que no le interese (y «restaurar» si se arrepiente), y «Salir» hasta abajo. El orden es de cada quien y viaja con su cuenta a todos los servicios (`/api/menu`, guardado por su identificador de Google). Así cada servicio le hace publicidad a los demás, y nadie vuelve a buscar una liga. El catálogo vive en `publico/servicios.json` del login: un servicio nuevo se agrega ahí, una sola vez, y aparece en el menú de todos.
+
 ### Cómo se pone en un servicio (dos líneas, antes de `</body>`)
 
 ```html

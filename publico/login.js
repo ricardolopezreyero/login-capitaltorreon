@@ -59,7 +59,7 @@
   };
   const montar = (el) => {
     if (!el) return; estilo(); el.classList.add('login-ct'); const q = LoginCT.quien();
-    el.innerHTML = q ? `<button type="button" class="foto" data-ct="foto" title="Tus juegos y proyectos" aria-haspopup="menu">${q.picture ? `<img src="${esc(q.picture)}" alt="" referrerpolicy="no-referrer">` : '<i class="ini">' + esc((q.name || q.email || '?').trim()[0].toUpperCase()) + '</i>'}<span class="n">${esc(q.name || q.email)}</span><i class="v">▾</i></button>` : `<button type="button" data-ct="entrar">${G}Entrar con Google</button>`;
+    el.innerHTML = q ? `<button type="button" class="foto" data-ct="foto" title="Tus juegos y proyectos" aria-haspopup="menu">${q.picture ? `<img src="${esc(q.picture)}" alt="" referrerpolicy="no-referrer">` : '<i class="ini">' + esc((((q.name || '').split(' ').find((w) => w && !/^(ing|lic|dr|dra|mtro|mtra|arq|sr|sra|don|doña)\.?$/i.test(w)) || q.email || '?')[0]).toUpperCase()) + '</i>'}<span class="n">${esc(q.name || q.email)}</span><i class="v">▾</i></button>` : `<button type="button" data-ct="entrar">${G}Entrar con Google</button>`;
     el.querySelector('[data-ct="entrar"]')?.addEventListener('click', () => LoginCT.entrar());
     el.querySelector('[data-ct="foto"]')?.addEventListener('click', (e) => abrirMenu(e.currentTarget));
   };
