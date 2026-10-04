@@ -124,6 +124,20 @@ export default {
       if (d.uso || d.ocultar || d.restaurar) { m.t = Date.now(); await env.MENU.put(llave, JSON.stringify(m)); }
       return json(m, 200, cors);
     }
+    // Las preferencias: lo que cada persona personaliza en cada servicio (el fondo del home, el sonido de un juego, el
+    // tamaño del texto…) viaja con su cuenta. Un blob por persona, con un apartado por servicio; cada valor lleva su hora
+    // para que gane el cambio más reciente entre equipos. Se identifica con el pase del servicio.
+    if (u.pathname === "/api/prefs" && request.method === "POST") {
+      let d; try { d = await request.json(); } catch { return json({ error: "datos" }, 400, cors); }
+      const g = await verificarPase(String(d.pase || ""), env.EMISOR, jwksDe(env, request));
+      if (!g || g.aud === "login") return json({ error: "pase" }, 401, cors);
+      const llave = "prefs:" + g.sub, host = g.aud, ok = (k) => typeof k === "string" && /^[\w.:-]{1,64}$/.test(k);
+      let todo = (await env.MENU.get(llave, "json")) || {}; let p = todo[host] || {}, cambio = false;
+      if (d.set && typeof d.set === "object") for (const [k, x] of Object.entries(d.set).slice(0, 60)) { if (!ok(k) || !x || typeof x.v !== "string" || x.v.length > 20000) continue; const t = Math.min(Date.now() + 60000, Math.floor(Number(x.t)) || Date.now()); if (!p[k] || p[k].t < t) { p[k] = { v: x.v, t }; cambio = true; } }
+      if (Array.isArray(d.borrar)) for (const k of d.borrar.slice(0, 60)) { if (ok(k) && p[k]) { delete p[k]; cambio = true; } }
+      if (cambio) { todo[host] = p; const texto = JSON.stringify(todo); if (texto.length > 400000) return json({ error: "grande" }, 413, cors); await env.MENU.put(llave, texto); }
+      return json({ prefs: p }, 200, cors);
+    }
     if (u.pathname.startsWith("/api/")) return json({ error: "no" }, 404, cors);
     const r = await env.ASSETS.fetch(request);
     if (u.pathname === "/servicios.json" || u.pathname === "/login.js" || u.pathname === "/verificar.js") { const h = new Headers(r.headers); h.set("access-control-allow-origin", "*"); h.set("cache-control", "public, max-age=300, stale-while-revalidate=86400"); return new Response(r.body, { status: r.status, headers: h }); }

@@ -75,6 +75,46 @@
     montar, al(fn) { oyentes.push(fn); if (recien) fn(LoginCT.quien()); }, menu: abrirMenu,
     recien: () => recien,
   };
+  // ── Preferencias que viajan con la cuenta. Cada servicio declara qué claves de localStorage son personalización
+  //    (<script src=".../login.js" data-prefs="clave1,clave2">). Desde ese momento: lo que la persona cambie se sube a su
+  //    cuenta; al entrar en otro equipo (o con otra cuenta) se aplica lo suyo; al cambiar de cuenta cambian todas las
+  //    preferencias; al salir, el equipo vuelve a los valores de fábrica. Gana siempre el cambio más reciente.
+  const PREF_CLAVES = ((document.currentScript && document.currentScript.dataset.prefs) || '').split(',').map((x) => x.trim()).filter(Boolean);
+  const P_SUB = 'ct_prefs_sub', P_T = 'ct_prefs_t';
+  const marcas = () => { try { return JSON.parse(localStorage.getItem(P_T) || '{}'); } catch { return {}; } };
+  const marcar = (k, t) => { const m = marcas(); m[k] = t; try { localStorage.setItem(P_T, JSON.stringify(m)); } catch {} };
+  let subirT = 0, enVivo = null, aplicando = false;
+  const subir = async () => { const pase = LoginCT.pase(); if (!pase || !PREF_CLAVES.length) return; const m = marcas(), set = {}, borrar = []; for (const k of PREF_CLAVES) { const v = localStorage.getItem(k); if (v === null) { if (m[k]) borrar.push(k); } else set[k] = { v, t: m[k] || 1 }; } try { await fetch(EMISOR + '/api/prefs', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pase, set, borrar }) }); } catch {} };
+  const programar = () => { clearTimeout(subirT); subirT = setTimeout(subir, 900); };
+  if (PREF_CLAVES.length && typeof Storage !== 'undefined') {
+    const si = Storage.prototype.setItem, ri = Storage.prototype.removeItem;
+    Storage.prototype.setItem = function (k, v) { si.call(this, k, v); if (this === localStorage && !aplicando && PREF_CLAVES.includes(k)) { marcar(k, Date.now()); programar(); } };
+    Storage.prototype.removeItem = function (k) { ri.call(this, k); if (this === localStorage && !aplicando && PREF_CLAVES.includes(k)) { marcar(k, Date.now()); programar(); } };
+  }
+  const sincronizar = async () => {
+    const q = LoginCT.quien(), pase = LoginCT.pase(); if (!q || !pase || !PREF_CLAVES.length) return;
+    let antes = ''; try { antes = localStorage.getItem(P_SUB) || ''; } catch {}
+    let nube; try { nube = (await (await fetch(EMISOR + '/api/prefs', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pase }) })).json()).prefs || {}; } catch { return; }
+    const cambioCuenta = antes && antes !== q.sub, m = marcas(), cambios = {}, set = {};
+    aplicando = true;
+    for (const k of PREF_CLAVES) {
+      const local = localStorage.getItem(k), tl = local === null ? 0 : (m[k] || 1), n = nube[k];
+      if (cambioCuenta) { if (n) { if (local !== n.v) { localStorage.setItem(k, n.v); cambios[k] = n.v; } } else if (local !== null) { localStorage.removeItem(k); cambios[k] = null; } }
+      else if (n && n.t >= tl) { if (local !== n.v) { localStorage.setItem(k, n.v); cambios[k] = n.v; } }
+      else if (local !== null) set[k] = { v: local, t: tl };
+    }
+    aplicando = false;
+    try { localStorage.setItem(P_SUB, q.sub); localStorage.setItem(P_T, JSON.stringify(cambioCuenta ? {} : m)); } catch {}
+    if (Object.keys(set).length) { try { await fetch(EMISOR + '/api/prefs', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pase, set }) }); } catch {} }
+    if (Object.keys(cambios).length) { if (enVivo) enVivo(cambios); else if (!sessionStorage.getItem('ct_prefs_recarga')) { try { sessionStorage.setItem('ct_prefs_recarga', '1'); } catch {} location.reload(); } }
+    else { try { sessionStorage.removeItem('ct_prefs_recarga'); } catch {} }
+  };
+  const limpiarPrefs = () => { aplicando = true; try { for (const k of PREF_CLAVES) localStorage.removeItem(k); localStorage.removeItem(P_SUB); localStorage.removeItem(P_T); } catch {} aplicando = false; };
+  LoginCT.alPrefs = (fn) => { enVivo = fn; };
+  LoginCT.prefs = () => Object.fromEntries(PREF_CLAVES.map((k) => [k, localStorage.getItem(k)]));
+  const salirBase = LoginCT.salir; LoginCT.salir = () => { limpiarPrefs(); salirBase(); };
+  if (LoginCT.quien()) setTimeout(sincronizar, recien ? 0 : 400);
+  oyentes.push(() => sincronizar());
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montarTodos); else montarTodos();
   if (recien) setTimeout(() => oyentes.forEach((f) => f(LoginCT.quien())), 0);
   if (LoginCT.quien()) setTimeout(usoAqui, 1500);
