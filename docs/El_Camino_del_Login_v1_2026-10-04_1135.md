@@ -42,7 +42,7 @@ Una sola puerta para toda la casa: **login.capitaltorreon.com**.
 <script src="https://login.capitaltorreon.com/login.js" defer></script>
 ```
 
-El `div` se llena solo: «Entrar con Google» si no hay sesión; la foto, el nombre y «Salir» si ya entró. Puede ir donde se quiera (dentro del encabezado, por ejemplo).
+El `div` se llena solo y es discreto (regla de Ricardo: es prácticamente el único botón arriba a la derecha): sin sesión, solo un botón redondo con la G de Google; con sesión, solo la foto o la inicial. Al tocarla sale el menú de la casa. Puede ir donde se quiera (dentro del encabezado, por ejemplo).
 
 Desde la página: `LoginCT.quien()` → `{ sub, email, name, picture, exp }` o `null` · `LoginCT.pase()` → el pase para el servidor · `LoginCT.entrar()` / `LoginCT.entrar(true)` (elegir cuenta) / `LoginCT.salir()` · `LoginCT.al(fn)` avisa cuando alguien acaba de entrar.
 

@@ -14,7 +14,7 @@ En cualquier página, antes de `</body>`:
 <script src="https://login.capitaltorreon.com/login.js" defer></script>
 ```
 
-El `div` se llena solo: «Entrar con Google» si no hay sesión, o la foto, el nombre y «Salir» si ya entró. Puede ir donde quieras (dentro del encabezado, por ejemplo). **Todo funciona sin entrar; entrar solo agrega.**
+El `div` se llena solo y es discreto: sin sesión, solo un botón redondo con la G de Google; con sesión, solo la foto (o la inicial). Al tocar la foto sale el menú de la casa, con «Salir» al final. Puede ir donde quieras (dentro del encabezado, por ejemplo). **Todo funciona sin entrar; entrar solo agrega.**
 
 - Quien ya entró en cualquier otro servicio de la casa **aparece dentro sin pulsar nada**: `login.js` le pregunta a la casa en un marco invisible (`/renovar`) y, si hay sesión, monta la ficha al instante. La sesión se renueva sola cuando le quedan menos de 7 días.
 - `LoginCT.quien()` → `{ sub, email, name, picture, exp }` si hay sesión vigente, o `null`.
