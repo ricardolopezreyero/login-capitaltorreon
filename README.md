@@ -33,6 +33,10 @@ const quien = await verificarPase(pase, "mi-servicio.capitaltorreon.com");   // 
 
 La verificación es local, con la llave pública de `/.well-known/jwks.json` (se trae una vez por hora). También existe `POST /api/verificar` `{ pase }` para quien prefiera preguntar.
 
+## El camino del login
+
+Por qué existe este servicio, qué camino dejamos atrás y las reglas para no tropezar otra vez: [docs/El_Camino_del_Login_v1_2026-10-04_1135.md](docs/El_Camino_del_Login_v1_2026-10-04_1135.md).
+
 ## Qué hay
 
 | Archivo | Qué es |
