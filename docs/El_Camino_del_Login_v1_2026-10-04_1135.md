@@ -52,6 +52,10 @@ Una sola puerta para toda la casa: **login.capitaltorreon.com**.
 
 El `div` se llena solo y es discreto (regla de Ricardo: es prácticamente el único botón arriba a la derecha): sin sesión, solo un botón redondo con la G de Google; con sesión, solo la foto o la inicial. Al tocarla sale el menú de la casa. Puede ir donde se quiera (dentro del encabezado, por ejemplo).
 
+**Dos formatos del mismo widget, y se usa el que convenga en cada lugar:** el **chico** (`data-login-ct`), la G redonda o la foto, para encabezados y barras donde hay otros iconos; y el **ancho** (`data-login-ct="ancho"`), un botón «Entrar con Google» a todo lo ancho (con sesión, la ficha con foto y nombre), para puertas de entrada, portadas y modales de cuenta. `data-texto` cambia el texto del ancho. Son el mismo botón con la misma lógica: nunca se dibuja un botón propio.
+
+**Cuando un servicio sí pide entrar para una parte** (por ejemplo, el panel del equipo de un negocio): la puerta pone el botón ancho de la casa primero y quien manda da acceso por correo desde su propio administrador; si ya existía otra forma de entrar (una clave), se deja abierta como segundo camino, no se cierra. La parte pública del servicio sigue sin pedir nada.
+
 Desde la página: `LoginCT.quien()` → `{ sub, email, name, picture, exp }` o `null` · `LoginCT.pase()` → el pase para el servidor · `LoginCT.entrar()` / `LoginCT.entrar(true)` (elegir cuenta) / `LoginCT.salir()` · `LoginCT.al(fn)` avisa cuando alguien acaba de entrar.
 
 En el Worker, para no confiar en el navegador: copiar [`publico/verificar.js`](../publico/verificar.js) y
@@ -65,7 +69,7 @@ La persona se identifica por `sub` (el identificador fijo de Google), no por el 
 
 ### Dónde ya está
 
-capitaltorreon.com, Mina, 2048, Carreteras de México, Cupido Algorítmico, Video Room, La Vela. **El ping pong no**: tiene su login propio, funciona y no se toca.
+capitaltorreon.com, Mina, 2048, Carreteras de México, Cupido Algorítmico, Video Room, La Vela, Ranitas · Pedidos (familias sin pedir nada; Ranitas Equipo con la puerta de la casa y acceso por correo). **El ping pong no**: tiene su login propio, funciona y no se toca.
 
 ---
 

@@ -16,16 +16,25 @@ En cualquier página, antes de `</body>`:
 
 El `div` se llena solo y es discreto: sin sesión, solo un botón redondo con la G de Google; con sesión, solo la foto (o la inicial). Al tocar la foto sale el menú de la casa, con «Salir» al final. Puede ir donde quieras (dentro del encabezado, por ejemplo). **Todo funciona sin entrar; entrar solo agrega.**
 
+**Dos formatos, según convenga:**
+
+| Formato | Etiqueta | Sin sesión | Con sesión | Dónde va |
+|---|---|---|---|---|
+| Chico | `<div data-login-ct></div>` | la G redonda | solo la foto | encabezados, barras laterales, junto a otros iconos |
+| Ancho | `<div data-login-ct="ancho"></div>` | botón «Entrar con Google» a todo lo ancho | ficha con foto y nombre | puertas de entrada, portadas, modales de cuenta |
+
+`data-texto="Entrar a mi tablero"` en el div cambia el texto del botón ancho. Desde JavaScript: `LoginCT.montar(el)` o `LoginCT.montar(el, 'ancho')`.
+
 - Quien ya entró en cualquier otro servicio de la casa **aparece dentro sin pulsar nada**: `login.js` le pregunta a la casa en un marco invisible (`/renovar`) y, si hay sesión, monta la ficha al instante. La sesión se renueva sola cuando le quedan menos de 7 días.
 - `LoginCT.quien()` → `{ sub, email, name, picture, exp }` si hay sesión vigente, o `null`.
 - `LoginCT.pase()` → el pase firmado, para mandarlo al servidor del servicio.
 - `LoginCT.entrar()` / `LoginCT.entrar(true)` (elegir otra cuenta) / `LoginCT.salir()` (sale aquí y de la casa).
-- `LoginCT.al(fn)` avisa cuando alguien acaba de entrar; `LoginCT.montar(el)` pinta la ficha en otro elemento.
+- `LoginCT.al(fn)` avisa cuando alguien acaba de entrar; `LoginCT.montar(el)` / `LoginCT.montar(el, 'ancho')` pinta el botón o la ficha en otro elemento.
 - **Preferencias con la cuenta:** `data-prefs="clave1,clave2"` en la etiqueta del script declara qué claves de `localStorage` son personalización; se guardan por persona y por servicio (`/api/prefs`), se aplican en cualquier equipo, cambian al cambiar de cuenta y se limpian al salir. `LoginCT.alPrefs(fn)` las aplica en vivo; sin eso, la página se recarga una vez.
 - **Superpoderes y Mi cuenta** (`/cuenta`): texto grande, contraste, menos movimiento, silencio y modo noche para toda la casa (clases en `<html>`, `LoginCT.casa()`, `LoginCT.alCasa(fn)`); uso por servicio (`/api/uso`); sugerencias automáticas de una sola vez; ver y borrar todo lo guardado (`/api/cuenta`).
 - **Al tocar la foto** sale el menú de la casa: todos los juegos y proyectos (`publico/servicios.json`), en el orden de uso de cada persona (se guarda en `/api/menu`), con bote para quitar y «Salir» al final. Un servicio nuevo se agrega al catálogo una sola vez y aparece en el menú de todos.
 
-Ya está en: capitaltorreon.com, Mina, 2048, Carreteras, Cupido, Video Room y La Vela.
+Ya está en: capitaltorreon.com, Mina, 2048, Carreteras, Cupido, Video Room, La Vela y Ranitas · Pedidos.
 
 En el Worker del servicio, para no confiar en el navegador, copia [`publico/verificar.js`](publico/verificar.js) y:
 
