@@ -1,11 +1,76 @@
 {
   "servicios": [
-    { "id": "mina", "n": "Mina", "ic": "⛏️", "tipo": "juego", "d": "Excava con tus amigos en un mundo de 10 km", "url": "https://mina.capitaltorreon.com", "host": "mina.capitaltorreon.com" },
-    { "id": "2048", "n": "2048", "ic": "🔢", "tipo": "juego", "d": "Une fichas iguales y llega a 2048", "url": "https://2048.capitaltorreon.com", "host": "2048.capitaltorreon.com" },
-    { "id": "video", "n": "Video Room", "ic": "🎥", "tipo": "proyecto", "d": "Tu sala de video en vivo con cobro por hora", "url": "https://video.capitaltorreon.com", "host": "video.capitaltorreon.com" },
-    { "id": "vela", "n": "La Vela", "ic": "🕯️", "tipo": "proyecto", "d": "Veladora con cartucho retornable", "url": "https://vela.capitaltorreon.com", "host": "vela.capitaltorreon.com" },
-    { "id": "carreteras", "n": "Carreteras de México", "ic": "🛣️", "tipo": "proyecto", "d": "México puede moverse el doble", "url": "https://carreteras.capitaltorreon.com", "host": "carreteras.capitaltorreon.com" },
-    { "id": "cupido", "n": "Cupido Algorítmico", "ic": "💘", "tipo": "proyecto", "d": "Parejas por afinidad, con doble sí", "url": "https://cupido.capitaltorreon.com", "host": "cupido.capitaltorreon.com" },
-    { "id": "capital", "n": "CapitalTorreon", "ic": "₿", "tipo": "proyecto", "d": "El inicio de todo", "url": "https://capitaltorreon.com", "host": "capitaltorreon.com" }
+    {
+      "id": "ranita",
+      "n": "Ranitas · Pedidos",
+      "ic": "🐸",
+      "tipo": "proyecto",
+      "d": "Gorditas para toda la familia: cada quien pide lo suyo",
+      "url": "https://ranita.capitaltorreon.com",
+      "host": "ranita.capitaltorreon.com"
+    },
+    {
+      "id": "mina",
+      "n": "Mina",
+      "ic": "⛏️",
+      "tipo": "juego",
+      "d": "Excava con tus amigos en un mundo de 10 km",
+      "url": "https://mina.capitaltorreon.com",
+      "host": "mina.capitaltorreon.com"
+    },
+    {
+      "id": "2048",
+      "n": "2048",
+      "ic": "🔢",
+      "tipo": "juego",
+      "d": "Une fichas iguales y llega a 2048",
+      "url": "https://2048.capitaltorreon.com",
+      "host": "2048.capitaltorreon.com"
+    },
+    {
+      "id": "video",
+      "n": "Video Room",
+      "ic": "🎥",
+      "tipo": "proyecto",
+      "d": "Tu sala de video en vivo con cobro por hora",
+      "url": "https://video.capitaltorreon.com",
+      "host": "video.capitaltorreon.com"
+    },
+    {
+      "id": "vela",
+      "n": "La Vela",
+      "ic": "🕯️",
+      "tipo": "proyecto",
+      "d": "Veladora con cartucho retornable",
+      "url": "https://vela.capitaltorreon.com",
+      "host": "vela.capitaltorreon.com"
+    },
+    {
+      "id": "carreteras",
+      "n": "Carreteras de México",
+      "ic": "🛣️",
+      "tipo": "proyecto",
+      "d": "México puede moverse el doble",
+      "url": "https://carreteras.capitaltorreon.com",
+      "host": "carreteras.capitaltorreon.com"
+    },
+    {
+      "id": "cupido",
+      "n": "Cupido Algorítmico",
+      "ic": "💘",
+      "tipo": "proyecto",
+      "d": "Parejas por afinidad, con doble sí",
+      "url": "https://cupido.capitaltorreon.com",
+      "host": "cupido.capitaltorreon.com"
+    },
+    {
+      "id": "capital",
+      "n": "CapitalTorreon",
+      "ic": "₿",
+      "tipo": "proyecto",
+      "d": "El inicio de todo",
+      "url": "https://capitaltorreon.com",
+      "host": "capitaltorreon.com"
+    }
   ]
 }
